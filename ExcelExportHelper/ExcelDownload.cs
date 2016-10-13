@@ -189,7 +189,7 @@ namespace ExcelExportHelper
         private string TemporarySave()
         {
             string _path = AppDomain.CurrentDomain.BaseDirectory;
-            _path += string.Format(@"\TemporarySave{0}.xlsx", DateTime.Now.ToString("hhmmss"));
+            _path += string.Format(@"\TemporarySave{0}.xls", DateTime.Now.ToString("hhmmss"));
             using (FileStream file = new FileStream(_path, FileMode.Create))
             {
                 hssfWork.Write(file);
