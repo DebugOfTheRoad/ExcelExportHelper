@@ -85,7 +85,7 @@ namespace ExcelExportHelper
                 IRow _rowValue = hssfSheet.CreateRow(_rowNum);
                 foreach (var cellItem in _excelInfos)
                 {
-                    object _cellItemValue = cellItem.Key.GetValue(rowItem);
+                    object _cellItemValue = cellItem.Key.GetValue(rowItem, null);
                     ICell _cell = _rowValue.CreateCell(_rowCell);
                     if (!cellStyleList.ContainsKey(cellItem.Value.ExcelStyle.ToString()))
                     {
