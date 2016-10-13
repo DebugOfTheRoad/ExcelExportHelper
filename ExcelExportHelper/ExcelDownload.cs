@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Configuration;
 using System.IO;
 using System.Reflection;
+using System.Text;
 using System.Web;
 
 namespace ExcelExportHelper
@@ -202,7 +203,10 @@ namespace ExcelExportHelper
         /// </summary>
         private void DownLoadExcel(byte[] byData)
         {
-            HttpContext.Current.Response.AddHeader("Content-Disposition", string.Format("attachment;filename={0}.xls", _excelName));
+            HttpContext.Current.Response.AddHeader("Content-Disposition", string.Format("attachment;filename={0}.xls", HttpUtility.UrlEncode(_excelName)));
+            HttpContext.Current.Response.AddHeader("Content-Transfer-Encoding", "binary");
+            HttpContext.Current.Response.ContentType = "application/octet-stream";
+            HttpContext.Current.Response.ContentEncoding = Encoding.GetEncoding("gb2312");
             HttpContext.Current.Response.BinaryWrite(byData);
             HttpContext.Current.Response.Flush();
             HttpContext.Current.Response.Close();
