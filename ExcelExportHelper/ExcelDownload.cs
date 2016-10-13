@@ -19,6 +19,7 @@ namespace ExcelExportHelper
         private readonly string _excelSheetName;
         private IWorkbook hssfWork { get; set; }
         private ISheet hssfSheet { get; set; }
+        private ExcelStyleMessage styleMessage { get; set; }
 
         /// <summary>
         /// 初始化Excel相关信息
@@ -31,6 +32,7 @@ namespace ExcelExportHelper
             _excelSheetName = ExcelSheetName;
             hssfWork = new HSSFWorkbook();
             hssfSheet = hssfWork.CreateSheet(_excelSheetName);
+            styleMessage = new ExcelStyleMessage();
         }
 
         /// <summary>
@@ -89,7 +91,7 @@ namespace ExcelExportHelper
                     ICell _cell = _rowValue.CreateCell(_rowCell);
                     if (!cellStyleList.ContainsKey(cellItem.Value.ExcelStyle.ToString()))
                     {
-                        ICellStyle _cellStyle = ExcelStyleMessage.GetCellStyle(hssfWork, cellItem.Value.ExcelStyle);
+                        ICellStyle _cellStyle = styleMessage.GetCellStyle(hssfWork, cellItem.Value.ExcelStyle);
                         cellStyleList.Add(cellItem.Value.ExcelStyle.ToString(), _cellStyle);
                     }
                     SetCellValue(cellItem, _cellItemValue, _cell);
@@ -105,7 +107,7 @@ namespace ExcelExportHelper
         /// </summary>
         private void SetCellValue(KeyValuePair<PropertyInfo, ExcelInfoAttribute> cellItem, object _cellItemValue, ICell _cell)
         {
-            string cellItemValue = _cellItemValue.ToString();
+            string cellItemValue = _cellItemValue == null ? "" : _cellItemValue.ToString();
             switch (cellItem.Key.PropertyType.ToString())
             {
                 case "System.String"://字符串类型   
@@ -152,12 +154,13 @@ namespace ExcelExportHelper
         {
             IRow rowTitle = hssfSheet.CreateRow(0);
             int _cellIndex = 0;
+            ICellStyle cellStyle = hssfWork.CreateCellStyle();
+            cellStyle = styleMessage.GetCellStyle(hssfWork, ExcelStyle.title);
             foreach (var item in excelInfos)
             {
                 ICell celltitle = rowTitle.CreateCell(_cellIndex);
-                celltitle.CellStyle = ExcelStyleMessage.GetCellStyle(hssfWork, ExcelStyle.title);
                 celltitle.SetCellValue(item.Value.Name);
-
+                celltitle.CellStyle = cellStyle;
                 hssfSheet.SetColumnWidth(_cellIndex, item.Value.Width);
                 _cellIndex++;
             }

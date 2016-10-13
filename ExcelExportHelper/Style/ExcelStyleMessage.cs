@@ -7,14 +7,14 @@ namespace ExcelExportHelper
     /// <summary>
     /// Excel样式管理
     /// </summary>
-    internal static class ExcelStyleMessage
+    internal class ExcelStyleMessage
     {
         /// <summary>
         /// 样式集合
         /// </summary>
-        private static Dictionary<string, ICellStyle> styleList { get; set; }
+        private Dictionary<string, ICellStyle> styleList { get; set; }
 
-        static ExcelStyleMessage()
+        public ExcelStyleMessage()
         {
             styleList = new Dictionary<string, ICellStyle>();
         }
@@ -24,7 +24,7 @@ namespace ExcelExportHelper
         /// </summary>
         /// <param name="excelStyle">Excel样式枚举</param>
         /// <returns></returns>
-        internal static ICellStyle GetCellStyle<T>(T workbook, ExcelStyle excelStyle) where T : IWorkbook
+        internal ICellStyle GetCellStyle<T>(T workbook, ExcelStyle excelStyle) where T : IWorkbook
         {
             if (styleList.ContainsKey(excelStyle.ToString()))
             {
@@ -60,7 +60,7 @@ namespace ExcelExportHelper
         /// </summary>
         /// <param name="excelStyle">样式枚举</param>
         /// <returns>操作类</returns>
-        private static CellStyleMethod GetStyleMethod(ExcelStyle excelStyle)
+        private CellStyleMethod GetStyleMethod(ExcelStyle excelStyle)
         {
             switch (excelStyle)
             {
