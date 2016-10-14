@@ -7,7 +7,7 @@ namespace ExcelExportHelper
     /// </summary>
     internal abstract class CellStyleMethod
     {
-        internal static IWorkbook workbook { get; set; }
+        internal static IWorkbook Workbook { get; set; }
         internal abstract ICellStyle SetCell(ICellStyle cellStyle);
     }
 }

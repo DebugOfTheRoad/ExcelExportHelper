@@ -12,11 +12,11 @@ namespace ExcelExportHelper
         /// <summary>
         /// 样式集合
         /// </summary>
-        private Dictionary<string, ICellStyle> styleList { get; set; }
+        private Dictionary<string, ICellStyle> StyleList { get; set; }
 
         public ExcelStyleMessage()
         {
-            styleList = new Dictionary<string, ICellStyle>();
+            StyleList = new Dictionary<string, ICellStyle>();
         }
 
         /// <summary>
@@ -26,9 +26,9 @@ namespace ExcelExportHelper
         /// <returns></returns>
         internal ICellStyle GetCellStyle<T>(T workbook, ExcelStyle excelStyle) where T : IWorkbook
         {
-            if (styleList.ContainsKey(excelStyle.ToString()))
+            if (StyleList.ContainsKey(excelStyle.ToString()))
             {
-                return styleList[excelStyle.ToString()];
+                return StyleList[excelStyle.ToString()];
             }
             ICellStyle _cellStyle = workbook.CreateCellStyle();
             _cellStyle.BorderTop = BorderStyle.Thin;
@@ -51,7 +51,7 @@ namespace ExcelExportHelper
             }
             styleMethod = GetStyleMethod(excelStyle);
             styleMethod.SetCell(_cellStyle);
-            styleList.Add(excelStyle.ToString(), _cellStyle);
+            StyleList.Add(excelStyle.ToString(), _cellStyle);
             return _cellStyle;
         }
 

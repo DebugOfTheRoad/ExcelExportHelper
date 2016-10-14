@@ -16,11 +16,11 @@ namespace ExcelExportHelper
     /// </summary>
     public class ExcelDownload
     {
-        private readonly string _excelName;
-        private readonly string _excelSheetName;
-        private IWorkbook hssfWork { get; set; }
-        private ISheet hssfSheet { get; set; }
-        private ExcelStyleMessage styleMessage { get; set; }
+        private readonly string excelName;
+        private readonly string excelSheetName;
+        private IWorkbook HssfWork { get; set; }
+        private ISheet HssfSheet { get; set; }
+        private ExcelStyleMessage StyleMessage { get; set; }
 
         /// <summary>
         /// 初始化Excel相关信息
@@ -29,11 +29,11 @@ namespace ExcelExportHelper
         /// <param name="ExcelSheetName">初始页签名称</param>
         public ExcelDownload(string ExcelName, string ExcelSheetName)
         {
-            _excelName = ExcelName;
-            _excelSheetName = ExcelSheetName;
-            hssfWork = new HSSFWorkbook();
-            hssfSheet = hssfWork.CreateSheet(_excelSheetName);
-            styleMessage = new ExcelStyleMessage();
+            excelName = ExcelName;
+            excelSheetName = ExcelSheetName;
+            HssfWork = new HSSFWorkbook();
+            HssfSheet = HssfWork.CreateSheet(excelSheetName);
+            StyleMessage = new ExcelStyleMessage();
         }
 
         /// <summary>
@@ -51,7 +51,7 @@ namespace ExcelExportHelper
         /// <param name="excelSetMethod">操作Excel方法</param>
         public void ExportExcel(Action<IWorkbook, ISheet> excelSetMethod)
         {
-            excelSetMethod.Invoke(hssfWork, hssfSheet);
+            excelSetMethod.Invoke(HssfWork, HssfSheet);
             DownLoadExcel();
         }
 
@@ -66,7 +66,7 @@ namespace ExcelExportHelper
             {
                 return;
             }
-            CellStyleMethod.workbook = hssfWork;
+            CellStyleMethod.Workbook = HssfWork;
             Dictionary<PropertyInfo, ExcelInfoAttribute> _excelInfos = GetPropInfo<T>();
             SetExcelTitle(_excelInfos);
             SetExcelContent(list, _excelInfos);
@@ -77,22 +77,22 @@ namespace ExcelExportHelper
         /// </summary>
         /// <typeparam name="T">Excel模型实体</typeparam>
         /// <param name="list">Excel数据集合</param>
-        /// <param name="_excelInfos"></param>
-        private void SetExcelContent<T>(IEnumerable<T> list, Dictionary<PropertyInfo, ExcelInfoAttribute> _excelInfos)
+        /// <param name="excelInfos"></param>
+        private void SetExcelContent<T>(IEnumerable<T> list, Dictionary<PropertyInfo, ExcelInfoAttribute> excelInfos)
         {
             int _rowNum = 1;
             Dictionary<string, ICellStyle> cellStyleList = new Dictionary<string, ICellStyle>();
             foreach (T rowItem in list)
             {
                 int _rowCell = 0;
-                IRow _rowValue = hssfSheet.CreateRow(_rowNum);
-                foreach (var cellItem in _excelInfos)
+                IRow _rowValue = HssfSheet.CreateRow(_rowNum);
+                foreach (var cellItem in excelInfos)
                 {
                     object _cellItemValue = cellItem.Key.GetValue(rowItem, null);
                     ICell _cell = _rowValue.CreateCell(_rowCell);
                     if (!cellStyleList.ContainsKey(cellItem.Value.ExcelStyle.ToString()))
                     {
-                        ICellStyle _cellStyle = styleMessage.GetCellStyle(hssfWork, cellItem.Value.ExcelStyle);
+                        ICellStyle _cellStyle = StyleMessage.GetCellStyle(HssfWork, cellItem.Value.ExcelStyle);
                         cellStyleList.Add(cellItem.Value.ExcelStyle.ToString(), _cellStyle);
                     }
                     SetCellValue(cellItem, _cellItemValue, _cell);
@@ -106,23 +106,23 @@ namespace ExcelExportHelper
         /// <summary>
         /// 设置单元格内容
         /// </summary>
-        private void SetCellValue(KeyValuePair<PropertyInfo, ExcelInfoAttribute> cellItem, object _cellItemValue, ICell _cell)
+        private void SetCellValue(KeyValuePair<PropertyInfo, ExcelInfoAttribute> cellItem, object _cellItemValue, ICell cell)
         {
             string cellItemValue = _cellItemValue == null ? "" : _cellItemValue.ToString();
             switch (cellItem.Key.PropertyType.ToString())
             {
                 case "System.String"://字符串类型   
-                    _cell.SetCellValue(cellItemValue);
+                    cell.SetCellValue(cellItemValue);
                     break;
                 case "System.DateTime"://日期类型   
                     DateTime dateV;
                     DateTime.TryParse(cellItemValue, out dateV);
-                    _cell.SetCellValue(dateV);
+                    cell.SetCellValue(dateV);
                     break;
                 case "System.Boolean"://布尔型   
                     bool boolV = false;
                     bool.TryParse(cellItemValue, out boolV);
-                    _cell.SetCellValue(boolV);
+                    cell.SetCellValue(boolV);
                     break;
                 case "System.Int16"://整型   
                 case "System.Int32":
@@ -130,20 +130,20 @@ namespace ExcelExportHelper
                 case "System.Byte":
                     int intV = 0;
                     int.TryParse(cellItemValue, out intV);
-                    _cell.SetCellValue(intV);
+                    cell.SetCellValue(intV);
                     break;
                 case "System.Decimal"://浮点型   
                 case "System.Double":
                     double doubV = 0;
                     double.TryParse(cellItemValue, out doubV);
-                    _cell.SetCellType(CellType.Numeric);
-                    _cell.SetCellValue(doubV);
+                    cell.SetCellType(CellType.Numeric);
+                    cell.SetCellValue(doubV);
                     break;
                 case "System.DBNull"://空值处理   
-                    _cell.SetCellValue("");
+                    cell.SetCellValue("");
                     break;
                 default:
-                    _cell.SetCellValue("");
+                    cell.SetCellValue("");
                     break;
             }
         }
@@ -153,16 +153,16 @@ namespace ExcelExportHelper
         /// </summary>
         private void SetExcelTitle(Dictionary<PropertyInfo, ExcelInfoAttribute> excelInfos)
         {
-            IRow rowTitle = hssfSheet.CreateRow(0);
+            IRow rowTitle = HssfSheet.CreateRow(0);
             int _cellIndex = 0;
-            ICellStyle cellStyle = hssfWork.CreateCellStyle();
-            cellStyle = styleMessage.GetCellStyle(hssfWork, ExcelStyle.title);
+            ICellStyle cellStyle = HssfWork.CreateCellStyle();
+            cellStyle = StyleMessage.GetCellStyle(HssfWork, ExcelStyle.title);
             foreach (var item in excelInfos)
             {
                 ICell celltitle = rowTitle.CreateCell(_cellIndex);
                 celltitle.SetCellValue(item.Value.Name);
                 celltitle.CellStyle = cellStyle;
-                hssfSheet.SetColumnWidth(_cellIndex, item.Value.Width);
+                HssfSheet.SetColumnWidth(_cellIndex, item.Value.Width);
                 _cellIndex++;
             }
         }
@@ -192,7 +192,7 @@ namespace ExcelExportHelper
             _path += string.Format(@"\TemporarySave{0}.xls", DateTime.Now.ToString("hhmmss"));
             using (FileStream file = new FileStream(_path, FileMode.Create))
             {
-                hssfWork.Write(file);
+                HssfWork.Write(file);
                 file.Close();
             }
             return _path;
@@ -203,7 +203,7 @@ namespace ExcelExportHelper
         /// </summary>
         private void DownLoadExcel(byte[] byData)
         {
-            HttpContext.Current.Response.AddHeader("Content-Disposition", string.Format("attachment;filename={0}.xls", HttpUtility.UrlEncode(_excelName)));
+            HttpContext.Current.Response.AddHeader("Content-Disposition", string.Format("attachment;filename={0}.xls", HttpUtility.UrlEncode(excelName)));
             HttpContext.Current.Response.AddHeader("Content-Transfer-Encoding", "binary");
             HttpContext.Current.Response.ContentType = "application/octet-stream";
             HttpContext.Current.Response.ContentEncoding = Encoding.GetEncoding("gb2312");

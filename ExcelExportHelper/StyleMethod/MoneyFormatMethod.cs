@@ -10,7 +10,7 @@ namespace ExcelExportHelper
     {
         internal override ICellStyle SetCell(ICellStyle cellStyle)
         {
-            IDataFormat format = workbook.CreateDataFormat();
+            IDataFormat format = Workbook.CreateDataFormat();
             cellStyle.DataFormat = HSSFDataFormat.GetBuiltinFormat("￥#,##0");
             return cellStyle;
         }
